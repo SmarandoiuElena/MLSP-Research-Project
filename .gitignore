@@ -1,2 +1,6 @@
 __pycache__
-__venv__
+venv
+data
+First_Pytorch_Program.py
+kvasir-dataset-v2.zip
+kvasir-dataset-v2
