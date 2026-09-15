@@ -103,6 +103,16 @@ Papers:
 https://www.mdpi.com/1424-8220/23/6/3176 (for pipeline and augmentation) [1]
 https://www.nature.com/articles/s41598-024-53955-8 (suppoorting augmentation decision) [2]
 
+image_size = moddified corresponding to the resnet18
+num_classes = 8
+epochs = 20 maximum
+batch_size = 64
+loss_fn = CrossEntropyLoss
+optimizer = Adam with lr = 0.001
+scheduler = stepLR with step = 2 and gamma = 0.9
+My default train/test/validate subsets are 70%/15%/15%.
+Trained on T4 GPU(on google colab)
+
 I started implementing image augmentation for which I took inspiration from two paper, both
 focusing on the classification of endoscopic images. The first paper concluded that high changes
 in hue and color don't save the model from overfitting when it comes to medical images (even 
@@ -249,3 +259,46 @@ Using cuda device Test Error:   Accuracy: 90.1%, Avg loss: 0.252590
 ![Average accuracy over epochs with step = 2](./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg)
 ![Loss over epochs with step = 2](./metrics/Loss_over_epochs_2_page-0001.jpg)
 
+### Reproducibility
+
+After obtaining a strong pipeline I set a random seed (42) to ensure reproducibility later, maintaining the parameters as before. After seeing the new trend of the model I chose
+to increase the maximum number of epochs to 50 and set the tolerance to 10.
+
+#### Train Metrics
+![Train Average Accuracy over epochs](./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg)
+![Train Loss over epochs](./metrics/Train_loss_over_epochs_2_page-0001.jpg)
+
+### Validation Metrics
+![Validation Average Accuracy over epochs](./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg)
+![Validation Loss over epochs](./metrics/Validation_Loss_over_epochs_2_page-0001.jpg)
+
+The plots resemble those in the first paper.
+
+## Test metrics
+
+![Confusion matrix](./metrics/Confusion_matrix_resnet18%20(1)_page-0001.jpg)
+
+```bash
+Test Error: 
+ Accuracy: 90.8%, Avg loss: 0.313422 
+
+                        precision    recall  f1-score   support
+
+    dyed-lifted-polyps     0.9437    0.8933    0.9178       150
+dyed-resection-margins     0.9051    0.9533    0.9286       150
+           esophagitis     0.7561    0.8267    0.7898       150
+          normal-cecum     0.9610    0.9867    0.9737       150
+        normal-pylorus     0.9677    1.0000    0.9836       150
+         normal-z-line     0.8074    0.7267    0.7649       150
+                polyps     0.9856    0.9133    0.9481       150
+    ulcerative-colitis     0.9477    0.9667    0.9571       150
+
+              accuracy                         0.9083      1200
+             macro avg     0.9093    0.9083    0.9079      1200
+          weighted avg     0.9093    0.9083    0.9079      1200
+```
+
+The total accuracy came at 90,8% consistent with the first result of 90,1%.
+The confusion matrix shows a correlation between esophagitis and the z-line
+but that is also consistent with the second paper as the z-line is also present
+in the esophagitis photos.
