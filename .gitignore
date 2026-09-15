@@ -4,3 +4,8 @@ data
 First_Pytorch_Program.py
 kvasir-dataset-v2.zip
 kvasir-dataset-v2
+best_model.pth
+plot_train.py
+Accuracy_over_epochs.pdf
+Avg_loss_over_epochs.pdf
+try.py
