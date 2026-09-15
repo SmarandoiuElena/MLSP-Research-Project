@@ -242,10 +242,10 @@ Stopped at epoch 19
 Using cuda device Test Error:   Accuracy: 90.1%, Avg loss: 0.252590
 ```
 #### Metrics for step = 10
-[Average accuracy over epochs with step = 10](./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg)
-[Loss over epochs with step = 10](./metrics/Loss_over_epochs-1_page-0001.jpg)
+![Average accuracy over epochs with step = 10](./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg)
+![Loss over epochs with step = 10](./metrics/Loss_over_epochs-1_page-0001.jpg)
 
 #### Metrics for step = 2
-[Average accuracy over epochs with step = 2](./metrics/Avg_accuracy__over_epochs-2_page-0001.jpg)
-[Loss over epochs with step = 2](./metrics/Loss_over_epochs-2_page-0001.jpg)
+![Average accuracy over epochs with step = 2](./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg)
+![Loss over epochs with step = 2](./metrics/Loss_over_epochs_2_page-0001.jpg)
 
