@@ -6,6 +6,8 @@ import seaborn as sn
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt 
+from torchvision import models
+import torch.nn as nn
 
 class ApplyTransformSubset(Dataset):
     def __init__(self, subset, transform=None):
@@ -55,7 +57,7 @@ def train(dataloader, model, device, loss_fn, optimizer):
         prediction = model(images)
         loss = loss_fn(prediction, labels)
         
-        train_loss += loss_fn(prediction, labels).item()
+        train_loss += loss.item()
         correct += (prediction.argmax(1) == labels).type(torch.float).sum().item()
         
         # backprog
@@ -72,7 +74,7 @@ def train(dataloader, model, device, loss_fn, optimizer):
         
     return train_loss, train_acc
     
-def test(dataloader, model, device, loss_fn):
+def test(dataloader, model, device, loss_fn, config):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     model.eval()
@@ -92,8 +94,7 @@ def test(dataloader, model, device, loss_fn):
             test_loss += loss_fn(pred, labels).item()
             correct += (pred.argmax(1) == labels).type(torch.float).sum().item()
             
-    classes = ('dyed-lifted-polyps', 'dyed-resection-margins', 'esophagitis', 'normal-cecum',
-               'normal-pylorus', 'normal-z-line', 'polyps', 'ulcerative-colitis')
+    classes = config['classes']
     test_loss /= num_batches
     correct /= size
     
@@ -116,15 +117,14 @@ def test(dataloader, model, device, loss_fn):
     plt.ylabel("True label")
     
     plt.tight_layout()
-    plt.savefig("Confusion_matrix_resnet18.pdf")
+    name = 'metrics/Confusion_matrix_' + config['model_name'] +'.jpg'
+    plt.savefig(name)
     plt.show()
     
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     
     report = classification_report(true, predict, target_names=classes, digits=4)
     print(report)
-    
-    return correct, test_loss
     
 def validate(dataloader, model, device, loss_fn):
     size = len(dataloader.dataset)
@@ -145,3 +145,15 @@ def validate(dataloader, model, device, loss_fn):
     
     print(f"Total Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {total_loss:>8f} \n")      
     return total_loss, correct
+
+def build_model(config, pretrained = True):
+    
+    if config['model_name'] == 'ResNet18':
+        # the pretrained model architecture
+        model = models.resnet18(weights = models.ResNet18_Weights.DEFAULT if pretrained else None)
+        # setting the right number of classes
+        model.fc = nn.Linear(model.fc.in_features, config["nr_classes"])
+    else:
+        raise Exception("Unknown model")
+    
+    return model

@@ -11,3 +11,6 @@ Avg_loss_over_epochs.pdf
 try.py
 best_model_resnet18.pth
 Confusion_matrix_resnet18.pdf
+cvs
+configs/_pycache_
+csv
