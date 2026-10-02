@@ -263,10 +263,10 @@ Using cuda device Test Error:   Accuracy: 90.1%, Avg loss: 0.252590
 </details>
 
 #### Metrics for step = 10
-<img src = "./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg" height = "390"> <img src = "./metrics/Loss_over_epochs-1_page-0001.jpg" height = "390">
+<img src = "./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg" height = "290"> <img src = "./metrics/Loss_over_epochs-1_page-0001.jpg" height = "290">
 
 #### Metrics for step = 2
-<img src ="./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Loss_over_epochs_2_page-0001.jpg" height = "390">
+<img src ="./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg" height = "290"> <img src = "./metrics/Loss_over_epochs_2_page-0001.jpg" height = "290">
 
 ### Reproducibility
 
@@ -274,10 +274,10 @@ After obtaining a strong pipeline I set a random seed (42) to ensure reproducibi
 to increase the maximum number of epochs to 50 and set the tolerance to 10.
 
 #### Train Metrics
-<img src = "./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Train_loss_over_epochs_2_page-0001.jpg" height = "390">
+<img src = "./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "290"> <img src = "./metrics/Train_loss_over_epochs_2_page-0001.jpg" height = "290">
 
 ### Validation Metrics
-<img src = "./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Validation_Loss_over_epochs_2_page-0001.jpg" height = "390">
+<img src = "./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "290"> <img src = "./metrics/Validation_Loss_over_epochs_2_page-0001.jpg" height = "290">
 
 The plots resemble those in the first paper.
 
@@ -376,11 +376,11 @@ In terms of accuracy the model did not differ that much but the change reduced t
 overfitting visibly and also dropped the loss from  0.235137  to 0.183802. The train
 and loss curves also got smoother.
 
-<img src="./metrics/Loss_over_epochs_ResNet18%20(3).jpg" height = "390"> <img src ="./metrics/Loss_over_epochs_ResNet18%20(4).jpg" height = "390">
+<img src="./metrics/Loss_over_epochs_ResNet18%20(3).jpg" height = "290"> <img src ="./metrics/Loss_over_epochs_ResNet18%20(4).jpg" height = "290">
 
-<img src="./metrics/Avg_accuracy_over_epochs_ResNet18%20(3).jpg" height = "390"> <img src ="./metrics/Avg_accuracy_over_epochs_ResNet18%20(4).jpg" height = "390">
+<img src="./metrics/Avg_accuracy_over_epochs_ResNet18%20(3).jpg" height = "290"> <img src ="./metrics/Avg_accuracy_over_epochs_ResNet18%20(4).jpg" height = "290">
 
-<img src="./metrics/Confusion_matrix_ResNet18%20(3).jpg" height = "416"> <img src ="./metrics/Confusion_matrix_ResNet18%20(4).jpg" height = "416">
+<img src="./metrics/Confusion_matrix_ResNet18%20(3).jpg" height = "310"> <img src ="./metrics/Confusion_matrix_ResNet18%20(4).jpg" height = "310">
 
 I tried training the model with a higher resolution of the images of 320 in case
 some details were lost but the results showed no real improvement and similar results
@@ -391,6 +391,13 @@ with a higher training time (1h 10m vs under an hour).
 I trained EfficientNetB0 with the same parameters, optimzer, scheduler and loss as the
 ResNet18 and the results were similar with ResNet18 being a little bit better in accuracy.
 
+After the first run of 30 epochs I tried to train it for more time to see if it can become
+better. In the last 20 epochs it gained very little 
 
+<img src="./metrics/Avg_accuracy_over_epochs_EfficientNetB0.jpg" height = "290"> <img src="./metrics/Avg_accuracy_over_epochs_EfficientNetB0%20(1).jpg" height = "290">
+
+<img src="./metrics/Loss_over_epochs_EfficientNetB0.jpg" height = "290"> <img src="./metrics/Loss_over_epochs_EfficientNetB0%20(1).jpg" height = "290">
+
+<img src="./metrics/Confusion_matrix_EfficientNetB0.jpg" height = "310"> <img src="./metrics/Confusion_matrix_EfficientNetB0%20(1).jpg" height = "310">
 
 
