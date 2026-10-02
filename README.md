@@ -1,6 +1,7 @@
 # MLSP Project - Medical images classification 
 ## Smarandoiu Elena-Andrada
 
+# ResNet18
 ### First Pipepline(experimental)
 
 The first ever pipeline I tried used the ResNet-18 model with pretrained weights.
@@ -20,7 +21,8 @@ After Epoch 3 the model had an imbalance and the accuracy dropped. That may be b
 I used a constant learing rate of 0.001 that is too fast. I also did not include image
 augmentation to the training set so the model strated overfitting. 
 
-Result:
+<details>
+  <summary><font color = "red"><strong><h1>Result:</h1></strong></font></summary>
 
 ```bash
 *******Epoch 1
@@ -97,6 +99,8 @@ Test Error:
  Accuracy: 86.8%, Avg loss: 0.391537 
 ```
 
+</details>
+
 ### Second Pipeline
 
 Papers:
@@ -122,7 +126,8 @@ would be more subtle.
 
 The second paper's findings supported the idea that only subtle changes should be made in colour
 and in addition also varried the contrast of the images. It also argued that geometrical variations
-such as horizontal or vertical flips are safe for medical images because they do not have a definite up, down or direction.
+such as horizontal or vertical flips are safe for medical images because they do not have a definite
+up, down or direction.
 
 For the augmentation process I combined these findings and set a probability for each operation.
 
@@ -130,8 +135,12 @@ I used the way paper [1] dealt with the imbalance after epoch 3 and used a StepL
 the intial learning rate for the Adam as 0.001 but decreased it at every 2 steps. My training loop
 keeps track of the best accuracy, saves and updates the best model. I initially put a maximum of
 20 epochs because my model starting downgrading around the epoch 15-16, and had a tolerance of of
-5 epochs (exiting early if the model did not improve). I chose step = 2 to keep the ration in the first paper (that downgraded the lr every 10 steps for 100 epochs). By lowering the step I obtained
+5 epochs (exiting early if the model did not improve). I chose step = 2 to keep the ration in the
+first paper (that downgraded the lr every 10 steps for 100 epochs). By lowering the step I obtained
 a much stable and nicer result.
+
+<details>
+  <summary><font color = "red"><strong><h1>Result</h1></strong></font></summary>
 
 ```bash
 *******Epoch 1
@@ -251,13 +260,13 @@ Total Error:
 Stopped at epoch 19
 Using cuda device Test Error:   Accuracy: 90.1%, Avg loss: 0.252590
 ```
+</details>
+
 #### Metrics for step = 10
-![Average accuracy over epochs with step = 10](./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg)
-![Loss over epochs with step = 10](./metrics/Loss_over_epochs-1_page-0001.jpg)
+<img src = "./metrics/Avg_accuracy__over_epochs-1_page-0001.jpg" height = "390"> <img src = "./metrics/Loss_over_epochs-1_page-0001.jpg" height = "390">
 
 #### Metrics for step = 2
-![Average accuracy over epochs with step = 2](./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg)
-![Loss over epochs with step = 2](./metrics/Loss_over_epochs_2_page-0001.jpg)
+<img src ="./metrics/Avg_accuracy__over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Loss_over_epochs_2_page-0001.jpg" height = "390">
 
 ### Reproducibility
 
@@ -265,18 +274,16 @@ After obtaining a strong pipeline I set a random seed (42) to ensure reproducibi
 to increase the maximum number of epochs to 50 and set the tolerance to 10.
 
 #### Train Metrics
-![Train Average Accuracy over epochs](./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg)
-![Train Loss over epochs](./metrics/Train_loss_over_epochs_2_page-0001.jpg)
+<img src = "./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Train_loss_over_epochs_2_page-0001.jpg" height = "390">
 
 ### Validation Metrics
-![Validation Average Accuracy over epochs](./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg)
-![Validation Loss over epochs](./metrics/Validation_Loss_over_epochs_2_page-0001.jpg)
+<img src = "./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "390"> <img src = "./metrics/Validation_Loss_over_epochs_2_page-0001.jpg" height = "390">
 
 The plots resemble those in the first paper.
 
 ## Test metrics
 
-![Confusion matrix](./metrics/Confusion_matrix_resnet18%20(1)_page-0001.jpg)
+<img src = "./metrics/Confusion_matrix_resnet18%20(1)_page-0001.jpg" height = "416">
 
 ```bash
 Test Error: 
@@ -302,3 +309,88 @@ The total accuracy came at 90,8% consistent with the first result of 90,1%.
 The confusion matrix shows a correlation between esophagitis and the z-line
 but that is also consistent with the second paper as the z-line is also present
 in the esophagitis photos.
+
+22:15 -> 23:30
+
+### Improvement
+
+The initial image resizing and crop were according to the ImageNet standard but in the
+second paper only resizing was used to make the photo a size the model could work with.
+Also the high confusion between the esophagitis and the z-line made me think that by
+cropping a good part of the details are lost when working with medical images. I tried
+to only resize the image even if it will shrink to test wheter the performace changes.
+
+The result was that the test accuracy went up to 92,3%, the Z-line recall jumped from
+0.7267 to 0.8267 and the esophagitis recal barely differed with 0.8267 to 0.86.
+
+Dropping the crop fixed some problems with the model recognizing the normal-z-line with
+the distintive features maybe being located on the edge of the frame. The most stubborn
+class remains esophagitis.
+
+```bash
+Test Error: 
+ Accuracy: 92.3%, Avg loss: 0.235137 
+
+                        precision    recall  f1-score   support
+
+    dyed-lifted-polyps     0.9320    0.9133    0.9226       150
+dyed-resection-margins     0.9276    0.9400    0.9338       150
+           esophagitis     0.8377    0.8600    0.8487       150
+          normal-cecum     0.9797    0.9667    0.9732       150
+        normal-pylorus     0.9677    1.0000    0.9836       150
+         normal-z-line     0.8552    0.8267    0.8407       150
+                polyps     0.9650    0.9200    0.9420       150
+    ulcerative-colitis     0.9231    0.9600    0.9412       150
+
+              accuracy                         0.9233      1200
+             macro avg     0.9235    0.9233    0.9232      1200
+          weighted avg     0.9235    0.9233    0.9232      1200
+```
+
+Still overfitting was present with the train loss keeping to lower and validation loss
+keeping to rise towards the end, train accuracy climbed while validation accuracy stayed
+flat. I tried to follow the second's paper recipe to use SGD for optimization, cosine
+decay learning rate with lr = 0.001, weight decay = 0 and keep the cross entropy loss.
+
+```bash
+Test Error: 
+ Accuracy: 92.8%, Avg loss: 0.183802 
+
+                        precision    recall  f1-score   support
+
+    dyed-lifted-polyps     0.9177    0.9667    0.9416       150
+dyed-resection-margins     0.9718    0.9200    0.9452       150
+           esophagitis     0.8322    0.8267    0.8294       150
+          normal-cecum     0.9673    0.9867    0.9769       150
+        normal-pylorus     0.9803    0.9933    0.9868       150
+         normal-z-line     0.8289    0.8400    0.8344       150
+                polyps     0.9653    0.9267    0.9456       150
+    ulcerative-colitis     0.9667    0.9667    0.9667       150
+
+              accuracy                         0.9283      1200
+             macro avg     0.9288    0.9283    0.9283      1200
+          weighted avg     0.9288    0.9283    0.9283      1200
+```
+
+In terms of accuracy the model did not differ that much but the change reduced the
+overfitting visibly and also dropped the loss from  0.235137  to 0.183802. The train
+and loss curves also got smoother.
+
+<img src="./metrics/Loss_over_epochs_ResNet18%20(3).jpg" height = "390"> <img src ="./metrics/Loss_over_epochs_ResNet18%20(4).jpg" height = "390">
+
+<img src="./metrics/Avg_accuracy_over_epochs_ResNet18%20(3).jpg" height = "390"> <img src ="./metrics/Avg_accuracy_over_epochs_ResNet18%20(4).jpg" height = "390">
+
+<img src="./metrics/Confusion_matrix_ResNet18%20(3).jpg" height = "416"> <img src ="./metrics/Confusion_matrix_ResNet18%20(4).jpg" height = "416">
+
+I tried training the model with a higher resolution of the images of 320 in case
+some details were lost but the results showed no real improvement and similar results
+with a higher training time (1h 10m vs under an hour).
+
+# EfficientNetB0
+
+I trained EfficientNetB0 with the same parameters, optimzer, scheduler and loss as the
+ResNet18 and the results were similar with ResNet18 being a little bit better in accuracy.
+
+
+
+
