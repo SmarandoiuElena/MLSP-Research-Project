@@ -45,8 +45,8 @@ print(f"Using {device} device")
 
 # image transformations coresponding to each model
 augmentation = transforms.Compose([
-    transforms.Resize(config['image_resize']),
-    transforms.CenterCrop(config['image_center_crop']),
+    transforms.Resize((config['image_resize'], config['image_resize'])),
+   # transforms.CenterCrop(config['image_center_crop']),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomVerticalFlip(p = 0.5),
     transforms.RandomApply([transforms.RandomRotation(degrees=30)], p=0.7),
@@ -57,8 +57,8 @@ augmentation = transforms.Compose([
 
 # image augmentation for training
 eval_transform = transforms.Compose([
-    transforms.Resize(config['image_resize']),
-    transforms.CenterCrop(config['image_center_crop']),
+    transforms.Resize((config['image_resize'], config['image_resize'])),
+  #  transforms.CenterCrop(config['image_center_crop']),
     transforms.ToTensor(),
     transforms.Normalize(mean=config['mean'], std = config['std'])
 ])
@@ -97,12 +97,13 @@ model = model.to(device)
 
 # defining the loss function and optimizer
 criterion = nn.CrossEntropyLoss() # loss in classification
-optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate']) # optimizer in training
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=config['step_size'], gamma=config['gamma'])
+optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'],
+                            momentum=config['momentum'], weight_decay=config['weight_decay']) # optimizer in training
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config['epochs'])
 
 # training loop
 best_acc = 0
-max_epochs = 10
+max_epochs = config['epochs']
 nr_epochs = 0
 
 # writing the values to a csv

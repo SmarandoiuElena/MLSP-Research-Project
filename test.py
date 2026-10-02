@@ -1,4 +1,3 @@
-# the script for testing
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -32,8 +31,8 @@ batch_size = config['batch_size']
 random_state = 42
 
 eval_transform = transforms.Compose([
-    transforms.Resize(config['image_resize']),
-    transforms.CenterCrop(config['image_center_crop']),
+    transforms.Resize((config['image_resize'], config['image_resize'])),
+ #   transforms.CenterCrop(config['image_center_crop']),
     transforms.ToTensor(),
     transforms.Normalize(mean=config['mean'], std=config['std'])
 ])
@@ -47,7 +46,7 @@ final_dataset = ApplyTransformSubset(my_datasets['test'], eval_transform)
 final_loader = DataLoader(final_dataset, batch_size=batch_size, shuffle=False)
 
 # loading the model
-model = build_model(config, pretrained=False)
+model = build_model(config, pretrained = final_dataset)
 model.load_state_dict(torch.load('models/best_model_'+ config['model_name'] + '.pth', map_location=device))
 model = model.to(device)
 
