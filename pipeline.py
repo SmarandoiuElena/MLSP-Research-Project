@@ -9,7 +9,7 @@ import csv
 import argparse
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument("--model", required=True, 
+parser.add_argument("--model", required=True,
                     choices=['ResNet18','EfficientNetB0','ConvNeXtTiny','SwinTiny'],
                     help="Architectures supported:\n- ResNet18\n- EfficientNetB0\n- ConvNeXtTiny\n- SwinTiny ")
 args = parser.parse_args()
@@ -22,12 +22,12 @@ elif args.model == 'ConvNeXtTiny':
     from configs.ConvNeXtTiny import config
 elif args.model == 'SwinTiny':
     from configs.SwinTiny import config
-    
+
 print(args.model)
 
 # the directory for the data
 data_dir = r'./kvasir-dataset-v2'
-random_state = 42
+random_state = 123
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -65,8 +65,8 @@ eval_transform = transforms.Compose([
 
 # spliting the set into test/train/val
 my_dataset = datasets.ImageFolder(data_dir)
-my_datasets = train_val_dataset(my_dataset, 0.3, random_state)
-my_datasets = test_val_dataset(my_datasets, 0.5, random_state)
+my_datasets = train_val_dataset(my_dataset, 0.3, 42)
+my_datasets = test_val_dataset(my_datasets, 0.5, 42)
 
 print(len(my_datasets['train']))
 print(len(my_datasets['val']))
@@ -96,9 +96,23 @@ model = build_model(config)
 model = model.to(device)
 
 # defining the loss function and optimizer
-criterion = nn.CrossEntropyLoss() # loss in classification
-optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'],
-                            momentum=config['momentum'], weight_decay=config['weight_decay']) # optimizer in training
+criterion = nn.CrossEntropyLoss(label_smoothing = 0.1) # loss in classification
+
+HEAD_MODULES = {
+    'ResNet18':       lambda m: m.fc,
+    'EfficientNetB0': lambda m: m.classifier,
+    'ConvNeXtTiny':   lambda m: m.classifier[2],
+    'SwinTiny':       lambda m: m.head,
+}
+
+head_params = list(HEAD_MODULES[config['model_name']](model).parameters())
+head_ids = {id(p) for p in head_params}
+backbone_params = [p for p in model.parameters() if id(p) not in head_ids]
+
+optimizer = torch.optim.AdamW([
+    {"params": backbone_params, "lr": config["learning_rate_backbone"]},
+    {"params": head_params, "lr": config["learning_rate_head"]},
+    ], weight_decay=config["weight_decay"]) # optimizer in training
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config['epochs'])
 
 # training loop
@@ -108,7 +122,7 @@ nr_epochs = 0
 
 # writing the values to a csv
 fields = ['validation loss', 'validation accuracy', 'train loss', 'train accuracy']
-filename = 'csv/' + config['model_name'] + '.csv'
+filename = './csv/' + config['model_name'] + '.csv'
 
 with open(filename, 'w') as csvfile:
     csvwriter = csv.writer(csvfile)
@@ -120,7 +134,7 @@ with open(filename, 'w') as csvfile:
         train_loss, train_acc = train(dataloader['train'], model, device, criterion, optimizer)
         loss, acc = validate(dataloader['val'], model, device, criterion)
         scheduler.step()
-        
+
         # updating the row
         row.append(loss)
         row.append(acc)
@@ -131,7 +145,7 @@ with open(filename, 'w') as csvfile:
         if acc > best_acc:
             best_acc = acc
             nr_epochs = 0
-            name = 'models/best_model_' + config['model_name'] + '.pth'
+            name = './models/best_model_' + config['model_name'] + '.pth'
             torch.save(model.state_dict(), name)
         else:
             nr_epochs += 1
@@ -139,4 +153,3 @@ with open(filename, 'w') as csvfile:
         if nr_epochs >= max_epochs:
             print(f"Stopped at epoch {epoch+1}")
             break
-        

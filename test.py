@@ -1,3 +1,4 @@
+# the script for testing
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -6,7 +7,7 @@ from function import test_val_dataset, train_val_dataset, test, ApplyTransformSu
 import argparse
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument("--model", required=True, 
+parser.add_argument("--model", required=True,
                     choices=['ResNet18','EfficientNetB0','ConvNeXtTiny','SwinTiny'],
                     help="Architectures supported:\n- ResNet18\n- EfficientNetB0\n- ConvNeXtTiny\n- SwinTiny ")
 args = parser.parse_args()
@@ -19,7 +20,7 @@ elif args.model == 'ConvNeXtTiny':
     from configs.ConvNeXtTiny import config
 elif args.model == 'SwinTiny':
     from configs.SwinTiny import config
-    
+
 # the device used for computation
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 print(f"Using {device} device")
@@ -39,15 +40,15 @@ eval_transform = transforms.Compose([
 
 # spliting the set into test/train/val
 my_dataset = datasets.ImageFolder(data_dir)
-my_datasets = train_val_dataset(my_dataset, 0.3, random_state)
-my_datasets = test_val_dataset(my_datasets, 0.5, random_state)
+my_datasets = train_val_dataset(my_dataset, 0.3, 42)
+my_datasets = test_val_dataset(my_datasets, 0.5, 42)
 
 final_dataset = ApplyTransformSubset(my_datasets['test'], eval_transform)
 final_loader = DataLoader(final_dataset, batch_size=batch_size, shuffle=False)
 
 # loading the model
-model = build_model(config, pretrained = final_dataset)
-model.load_state_dict(torch.load('models/best_model_'+ config['model_name'] + '.pth', map_location=device))
+model = build_model(config, pretrained = False)
+model.load_state_dict(torch.load('./models/best_model_'+ config['model_name'] + '.pth', map_location=device))
 model = model.to(device)
 
 criterion = nn.CrossEntropyLoss()

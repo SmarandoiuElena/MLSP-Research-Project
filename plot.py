@@ -1,10 +1,10 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
 import csv
 import argparse
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument("--model", required=True, 
+parser.add_argument("--model", required=True,
                     choices=['ResNet18','EfficientNetB0','ConvNeXtTiny','SwinTiny'],
                     help="Architectures supported:\n- ResNet18\n- EfficientNetB0\n- ConvNeXtTiny\n- SwinTiny ")
 args = parser.parse_args()
@@ -18,7 +18,7 @@ elif args.model == 'ConvNeXtTiny':
 elif args.model == 'SwinTiny':
     from configs.SwinTiny import config
 
-filename = "csv/" + config['model_name'] + '.csv'
+filename = "./csv/" + config['model_name'] + '.csv'
 
 val_loss_over_epochs = []
 val_acc_over_epochs = []
@@ -35,7 +35,7 @@ with open(filename, 'r') as csvfile:
             train_loss_over_epochs.append(float(row[2]))
             train_acc_over_epochs.append(float(row[3]))
         i += 1
-        
+
 plt.figure()
 y1 = np.array(val_loss_over_epochs)
 y2 = np.array(train_loss_over_epochs)
@@ -44,7 +44,7 @@ plt.plot(x, y1, color='r', label='validation loss')
 plt.plot(x, y2, color='b', label='train loss')
 plt.title("Loss_over_epochs_" + config['model_name'] )
 plt.legend()
-plt.savefig("metrics/Loss_over_epochs_" + config['model_name'] + ".jpg")
+plt.savefig("/content/drive/MyDrive/kvasir_outputs/metrics/Loss_over_epochs_" + config['model_name'] + ".jpg")
 plt.show()
 
 plt.figure()
@@ -55,5 +55,5 @@ plt.plot(x, y1, color='r', label='validation accuracy')
 plt.plot(x, y2, color='b', label='train accuracy')
 plt.title("Avg_accuracy_over_epochs_" + config['model_name'])
 plt.legend()
-plt.savefig("metrics/Avg_accuracy_over_epochs_" + config['model_name']+ ".jpg")
+plt.savefig("/content/drive/MyDrive/kvasir_outputs/metrics/Avg_accuracy_over_epochs_" + config['model_name']+ ".jpg")
 plt.show()

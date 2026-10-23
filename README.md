@@ -1,14 +1,14 @@
 # MLSP Project - Medical images classification 
 ## Smarandoiu Elena-Andrada
 
-# ResNet18
+# Training ResNet18
 ### First Pipepline(experimental)
 
 The first ever pipeline I tried used the ResNet-18 model with pretrained weights.
 
 Parameters:
 
-image_size = 255 (left by accident and forgot to be modified)
+image_size = 255
 num_classes = 8
 epochs = 10
 batch_size=32
@@ -270,13 +270,16 @@ Using cuda device Test Error:   Accuracy: 90.1%, Avg loss: 0.252590
 
 ### Reproducibility
 
-After obtaining a strong pipeline I set a random seed (42) to ensure reproducibility later, maintaining the parameters as before. After seeing the new trend of the model I chose
-to increase the maximum number of epochs to 50 and set the tolerance to 10.
+After obtaining a strong pipeline I set a random seed (42) to ensure reproducibility later, maintaining the
+parameters as before. After seeing the new trend of the model I chose to increase the maximum number of epochs
+to 50 and set the tolerance to 10.
 
 #### Train Metrics
+
 <img src = "./metrics/Train_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "290"> <img src = "./metrics/Train_loss_over_epochs_2_page-0001.jpg" height = "290">
 
 ### Validation Metrics
+
 <img src = "./metrics/Validation_Avg_accuracy_over_epochs_2_page-0001.jpg" height = "290"> <img src = "./metrics/Validation_Loss_over_epochs_2_page-0001.jpg" height = "290">
 
 The plots resemble those in the first paper.
@@ -382,22 +385,23 @@ and loss curves also got smoother.
 
 <img src="./metrics/Confusion_matrix_ResNet18%20(3).jpg" height = "310"> <img src ="./metrics/Confusion_matrix_ResNet18%20(4).jpg" height = "310">
 
-I tried training the model with a higher resolution of the images of 320 in case
-some details were lost but the results showed no real improvement and similar results
-with a higher training time (1h 10m vs under an hour).
+I tried training the model with a higher resolution of the images of 320 in case some details were lost but the
+results showed no real improvement and similar results with a higher training time (1h 10m vs under an hour).
 
-# EfficientNetB0
+## AdamW optimizer + cosine scheduler + cross entropy label smoothing
 
-I trained EfficientNetB0 with the same parameters, optimzer, scheduler and loss as the
-ResNet18 and the results were similar with ResNet18 being a little bit better in accuracy.
+For the comparison between the architectures I chose the AdamW optimizer with a cosine learning-rate schedule,
+instead of going back to SGD with momentum, or Adam. 
+As described in the Loshchilov & Hutter (*Decoupled Weight Decay Regularization*), ICLR 2019, L2 regularization in
+Adam is not equivalent to weight decay while AdamW applies the weight decay straight to the weights so that they
+all shrink by the same rate which makes the optimizer generalize better than Adam. AdamW becomes competitive
+with SGD with momentum on image classification so one optimizer can be used across models instead of switching it
+per task. In my own runs, AdamW matched SGD on ResNet18 (about 92-93% test accuracy) and converged within the
+30-epoch budget on EfficientNetB0, where SGD needed 50 epochs. For one shared recipe across different architectures
+the paper supports my choice of AdamW and cosine schedule but not the specific hyperparameters and there is no
+guarantee that this approach is optimal for every model.
 
-After the first run of 30 epochs I tried to train it for more time to see if it can become
-better. In the last 20 epochs it gained very little 
-
-<img src="./metrics/Avg_accuracy_over_epochs_EfficientNetB0.jpg" height = "290"> <img src="./metrics/Avg_accuracy_over_epochs_EfficientNetB0%20(1).jpg" height = "290">
-
-<img src="./metrics/Loss_over_epochs_EfficientNetB0.jpg" height = "290"> <img src="./metrics/Loss_over_epochs_EfficientNetB0%20(1).jpg" height = "290">
-
-<img src="./metrics/Confusion_matrix_EfficientNetB0.jpg" height = "310"> <img src="./metrics/Confusion_matrix_EfficientNetB0%20(1).jpg" height = "310">
-
+Label smoothing 0.1 was used to limit overconfidence and the loss-curve overfitting seen at higher learning rates.
+It stabilized the validation loss but did not change the accuracy within run-to-run noise. It was kept for all
+models so every architecture is trained identically.
 

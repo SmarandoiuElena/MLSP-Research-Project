@@ -14,3 +14,4 @@ Confusion_matrix_resnet18.pdf
 cvs
 configs/_pycache_
 csv
+*:Zone.Identifier
