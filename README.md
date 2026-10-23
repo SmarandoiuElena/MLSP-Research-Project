@@ -405,3 +405,4 @@ Label smoothing 0.1 was used to limit overconfidence and the loss-curve overfitt
 It stabilized the validation loss but did not change the accuracy within run-to-run noise. It was kept for all
 models so every architecture is trained identically.
 
+### Setting 
