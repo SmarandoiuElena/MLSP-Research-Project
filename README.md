@@ -405,4 +405,44 @@ Label smoothing 0.1 was used to limit overconfidence and the loss-curve overfitt
 It stabilized the validation loss but did not change the accuracy within run-to-run noise. It was kept for all
 models so every architecture is trained identically.
 
-### Setting 
+## Settings (identical for all architectures)
+
+| Setting | Value |
+|---|---|
+| Backbone learning rate | 3e-5 |
+| Classification head learning rate | 1e-3 |
+| Weight decay | 0.5 |
+| Epochs | 30 |
+| Batch size | 64 |
+| Loss | CrossEntropyLoss / with label smoothing 0.1 |
+| LR schedule | Cosine annealing over 30 epochs |
+
+The weight decay and learning rate were chosen from a small exploration on ResNet18 and they were not tuned
+separately for each model to keep the comparison fair.
+
+## Results
+
+| Model | Test Accuracy (%) | Precision (%) | Recall(%) | Macro F1(%) | Test Loss |
+| --- | --- | --- | --- | --- | --- |
+| ResNet18 | 92.83 ± 0.43|  92.88 ± 0.44 | 92.83 ± 0.43 | 92.82 ± 0.44 | 0.2666 ± 0.0035 |
+| EfficientNetB0 | 93.14 ± 0.05 | 93.16 ± 0.08 | 93.12 ± 0.08 | 93.12 ± 0.05 | 0.2672 ± 0.0002 |
+| SwinTiny | 93.72 ± 0.29 | 93.74 ± 0.29| 93.72 ± 0.29 | 93.72 ± 0.30 | 0.2408 ± 0.0120 |
+| ConvNeXtTiny | 93.81 ± 0.34 | 93.89 ± 0.30 | 93.81 ± 0.34 | 93.80 ± 0.35 | 0.2573 ± 0.0084 |
+
+
+| Model | Val. Loss | Val. Accuracy (%) | Train Loss | Train Acc (%) | Epochs |
+| --- | --- | --- | --- | --- | --- |
+| ResNet18 | 0.633 ± 0.003 | 92.944 ± 0.376 |  0.536 ± 0.001 | 98.339 ± 0.054 | 30 |
+| EfficientNetB0 | 0.629 ± 0.003 | 92.917 ± 0.500 | 0.575 ± 0.001 | 96.155 ± 0.258 | 30 |
+| SwinTiny | 0.629 ± 0.004 | 93.472 ± 0.567 |  0.505 ± 0.002 | 98.833 ± 0.166 | 30 |
+| ConvNeXtTiny | 0.612 ± 0.005 | 93.806 ± 0.376 | 0.484 ± 0.001 | 99.679 ± 0.078 | 30 |
+
+<p align="center">
+  <img src="final_pictures/Train_acc.png" width="40%" />
+  <img src="final_pictures/Train_loss.png" width="40%" />
+</p>
+
+<p align="center">
+  <img src="final_pictures/Val_acc.png" width="40%" />
+  <img src="final_pictures/Val_loss.png" width="40%" />
+</p>
