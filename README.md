@@ -405,6 +405,8 @@ Label smoothing 0.1 was used to limit overconfidence and the loss-curve overfitt
 It stabilized the validation loss but did not change the accuracy within run-to-run noise. It was kept for all
 models so every architecture is trained identically.
 
+Each model had three runs with three different seeds and the results were consisting for all four models.
+
 ## Settings (identical for all architectures)
 
 | Setting | Value |
@@ -446,3 +448,24 @@ separately for each model to keep the comparison fair.
   <img src="final_pictures/Val_acc.png" width="40%" />
   <img src="final_pictures/Val_loss.png" width="40%" />
 </p>
+
+<p align="center">
+  <big><b>ResNet18</b></big>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<big><b>EfficientNetB0</b></big>
+  <br />
+  <img src="final_matrix/Confusion_matrix_ResNet18%20(14).jpg" width="40%" />
+  <img src="final_matrix/Confusion_matrix_EfficientNetB0%20(5).jpg" width="40%" />
+</p>
+
+<p align="center">
+  <big><b>SwinTiny</b></big>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<big><b>ConvNeXtTiny</b></big>
+  <br />
+  <img src="final_matrix/Confusion_matrix_SwinTiny%20(1).jpg" width="40%" />
+  <img src="final_matrix/Confusion_matrix_ConvNeXtTiny%20(1).jpg" width="40%" />
+</p>
+The general conclusion is that on Kvasir v2 all architectures land in a narrow band: 92.8-93.8%. The graphs show a
+clear pattern, ConvNeXtTiny is the best followed by SwinTiny and EfficientNetB0 with ResNet18 are close together
+about 1 point lower.
+
+The error pattern is the same across architectures. Every model has its lowest recall on esophagitis and normal-z-line.
+Easy classes like normal-cecum and normal-pylorus are easy for everyone at 0.99-1.00 recall in all models. A smaller 
+error is dyed-lifted-polyps vs dyed-resection-margins. No architecture is clearly better on a particular class yet.
