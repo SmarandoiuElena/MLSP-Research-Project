@@ -166,3 +166,9 @@ def build_model(config, pretrained = True):
         raise Exception("Unknown model")
 
     return model
+
+def stratified_subset(dataset, fraction = 1.0, random = 42):
+
+    targets = [dataset.dataset.targets[i] for i in dataset.indices]
+    train_idx, _ = train_test_split(list(range(len(dataset))), train_size=fraction, stratify=targets, random_state=random)
+    return Subset(dataset, sorted(train_idx))

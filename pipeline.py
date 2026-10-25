@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 import torch.nn as nn
 import numpy as np
-from function import test_val_dataset, train_val_dataset, train, validate, ApplyTransformSubset, build_model
+from function import test_val_dataset, train_val_dataset, train, validate, ApplyTransformSubset, build_model, stratified_subset
 import random
 import csv
 import argparse
@@ -12,6 +12,10 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--model", required=True,
                     choices=['ResNet18','EfficientNetB0','ConvNeXtTiny','SwinTiny'],
                     help="Architectures supported:\n- ResNet18\n- EfficientNetB0\n- ConvNeXtTiny\n- SwinTiny ")
+parser.add_argument("--seed", type=int, default=42,
+                    help="seed for training (the data split always uses 42)")
+parser.add_argument("--train_fraction", type=float, default=1.0,
+                    help="share of the training images to use")
 args = parser.parse_args()
 
 if args.model == 'ResNet18':
@@ -27,7 +31,7 @@ print(args.model)
 
 # the directory for the data
 data_dir = r'./kvasir-dataset-v2'
-random_state = 123
+random_state = 42
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -37,7 +41,7 @@ def set_seed(seed=42):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-set_seed(random_state)
+set_seed(args.seed)
 
 # the device used for computation
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
@@ -68,6 +72,8 @@ my_dataset = datasets.ImageFolder(data_dir)
 my_datasets = train_val_dataset(my_dataset, 0.3, 42)
 my_datasets = test_val_dataset(my_datasets, 0.5, 42)
 
+my_datasets['train'] = stratified_subset(my_datasets['train'], args.train_fraction, 42)
+
 print(len(my_datasets['train']))
 print(len(my_datasets['val']))
 print(len(my_datasets['test']))
@@ -96,7 +102,7 @@ model = build_model(config)
 model = model.to(device)
 
 # defining the loss function and optimizer
-criterion = nn.CrossEntropyLoss(label_smoothing = 0.1) # loss in classification
+criterion = nn.CrossEntropyLoss(label_smoothing = config['label_smoothing']) # loss in classification
 
 HEAD_MODULES = {
     'ResNet18':       lambda m: m.fc,
