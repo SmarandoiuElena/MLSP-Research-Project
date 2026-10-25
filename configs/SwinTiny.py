@@ -8,6 +8,7 @@ config = {
     'learning_rate_backbone': 3e-5,
     'learning_rate_head': 1e-3,
     'weight_decay': 0.5,
+    'label_smoothing': 0.1,
     'gamma': 0.9,
     'mean': [0.485, 0.456, 0.406],
     'std': [0.229, 0.224, 0.225],
